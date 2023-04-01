@@ -10,10 +10,10 @@ from torch.backends import cudnn
 from tqdm import tqdm
 
 import sys
-sys.path.append('../pro_gan_pytorch')
+sys.path.append('./pro_gan_pytorch')
 
-from pro_gan_pytorch.networks import create_generator_from_saved_model
-from pro_gan_pytorch.utils import post_process_generated_images
+from networks import create_generator_from_saved_model
+from utils import post_process_generated_images
 
 # turn fast mode on
 cudnn.benchmark = True

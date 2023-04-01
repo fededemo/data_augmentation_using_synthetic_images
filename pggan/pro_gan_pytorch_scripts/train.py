@@ -7,13 +7,13 @@ import torch
 from torch.backends import cudnn
 
 import sys
-sys.path.append('../pro_gan_pytorch')
+sys.path.append('./pro_gan_pytorch')
 
-from pro_gan_pytorch.networks import load_models
-from pro_gan_pytorch.data_tools import ImageDirectoryDataset, get_transform
-from pro_gan_pytorch.gan import ProGAN
-from pro_gan_pytorch.networks import Discriminator, Generator
-from pro_gan_pytorch.utils import str2bool, str2GANLoss
+from networks import load_models
+from data_tools import ImageDirectoryDataset, get_transform
+from gan import ProGAN
+from networks import Discriminator, Generator
+from utils import str2bool, str2GANLoss
 
 # turn fast mode on
 cudnn.benchmark = True
@@ -45,7 +45,7 @@ def parse_arguments() -> argparse.Namespace:
                         help="whenever you want to resume training from saved models")
     parser.add_argument("--generator_path", action="store", type=Path, required="--retrain" in sys.argv,
                         help="Path to the generator model for retraining the ProGAN")
-    parser.add_argument("discriminator_path", action="store", type=Path, required="--retrain" in sys.argv,
+    parser.add_argument("--discriminator_path", action="store", type=Path, required="--retrain" in sys.argv,
                         help="Path to the discriminator model for retraining the ProGAN")
     # dataset related options:
     parser.add_argument("--rec_dir", action="store", type=str2bool, default=False, required=False,
