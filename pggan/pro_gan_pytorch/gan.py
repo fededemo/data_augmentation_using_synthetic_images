@@ -238,9 +238,7 @@ class ProGAN:
                     break
         return grad_ok
 
-    def get_save_info(
-        self, gen_optim: Optimizer, dis_optim: Optimizer
-    ) -> Dict[str, Any]:
+    def get_save_info(self, gen_optim: Optimizer, dis_optim: Optimizer) -> Dict[str, Any]:
 
         if self.device == torch.device("cpu"):
             generator_save_info = self.gen.get_save_info()

@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
 import torch
@@ -231,11 +231,27 @@ def create_generator_from_saved_model(saved_model_path: Path) -> Generator:
 
     # create a generator from the loaded data:
     generator_data = (
-        loaded_data["shadow_generator"]
-        if "shadow_generator" in loaded_data
-        else loaded_data["generator"]
+        loaded_data.get("shadow_generator", loaded_data["generator"])
     )
     generator = Generator(**generator_data["conf"])
     generator.load_state_dict(generator_data["state_dict"])
 
     return generator
+
+def create_discriminator_from_saved_model(saved_model_path: Path) -> Discriminator:
+    # load the data from the saved_model
+    loaded_data = torch.load(saved_model_path)
+
+    # create a discriminator from the loaded data:
+    discriminator_data = (
+        loaded_data.get("shadow_discriminator", loaded_data["discriminator"])
+    )
+    discriminator = Discriminator(**discriminator_data["conf"])
+    discriminator.load_state_dict(discriminator_data["state_dict"])
+
+    return discriminator
+
+def load_models(generator_path: Path, discriminator_path: Path) -> Tuple[Generator, Discriminator]:
+    generator = create_generator_from_saved_model(generator_path)
+    discriminator = create_discriminator_from_saved_model(discriminator_path)
+    return generator, discriminator

@@ -9,6 +9,9 @@ from cleanfid import fid
 from torch.backends import cudnn
 from tqdm import tqdm
 
+import sys
+sys.path.append('../pro_gan_pytorch')
+
 from pro_gan_pytorch.networks import create_generator_from_saved_model
 from pro_gan_pytorch.utils import post_process_generated_images
 
