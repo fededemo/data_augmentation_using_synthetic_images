@@ -5,8 +5,8 @@ import numpy as np
 import torch
 
 import torch as th
-from .custom_layers import EqualizedConv2d
-from .modules import (
+from custom_layers import EqualizedConv2d
+from modules import (
     ConDisFinalBlock,
     DisFinalBlock,
     DisGeneralConvBlock,
