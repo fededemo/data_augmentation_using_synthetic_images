@@ -19,11 +19,11 @@ from torch.utils.data import Dataset
 from torch.utils.tensorboard import SummaryWriter
 from torchvision.utils import save_image
 
-from .custom_layers import update_average
-from .data_tools import get_data_loader
-from .losses import GANLoss, WganGP
-from .networks import Discriminator, Generator
-from .utils import adjust_dynamic_range
+from custom_layers import update_average
+from data_tools import get_data_loader
+from losses import GANLoss, WganGP
+from networks import Discriminator, Generator
+from utils import adjust_dynamic_range
 
 
 class ProGAN:

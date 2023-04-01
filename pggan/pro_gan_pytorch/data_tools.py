@@ -9,7 +9,7 @@ from torch import Tensor
 from torch.utils.data import DataLoader, Dataset
 from torchvision.transforms import Compose, RandomHorizontalFlip, Resize, ToTensor
 
-from .utils import adjust_dynamic_range
+from utils import adjust_dynamic_range
 
 
 class NoOp(object):

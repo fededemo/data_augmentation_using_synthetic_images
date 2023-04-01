@@ -1,5 +1,5 @@
 import torch
-from .custom_layers import (
+from custom_layers import (
     EqualizedConv2d,
     EqualizedConvTranspose2d,
     MinibatchStdDev,
