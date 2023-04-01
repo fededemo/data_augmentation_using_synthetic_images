@@ -7,11 +7,9 @@ import torch
 from torch.backends import cudnn
 
 import sys
-
-from pggan.pro_gan_pytorch.networks import load_models
-
 sys.path.append('../pro_gan_pytorch')
 
+from pro_gan_pytorch.networks import load_models
 from pro_gan_pytorch.data_tools import ImageDirectoryDataset, get_transform
 from pro_gan_pytorch.gan import ProGAN
 from pro_gan_pytorch.networks import Discriminator, Generator

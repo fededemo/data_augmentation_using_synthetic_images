@@ -30,16 +30,16 @@ def update_average(model_tgt, model_src, beta):
 
 class EqualizedConv2d(Conv2d):
     def __init__(
-        self,
-        in_channels,
-        out_channels,
-        kernel_size,
-        stride=1,
-        padding=0,
-        dilation=1,
-        groups=1,
-        bias=True,
-        padding_mode="zeros",
+            self,
+            in_channels,
+            out_channels,
+            kernel_size,
+            stride=1,
+            padding=0,
+            dilation=1,
+            groups=1,
+            bias=True,
+            padding_mode="zeros",
     ) -> None:
         super().__init__(
             in_channels,
@@ -76,17 +76,17 @@ class EqualizedConv2d(Conv2d):
 
 class EqualizedConvTranspose2d(ConvTranspose2d):
     def __init__(
-        self,
-        in_channels,
-        out_channels,
-        kernel_size,
-        stride=1,
-        padding=0,
-        output_padding=0,
-        groups=1,
-        bias=True,
-        dilation=1,
-        padding_mode="zeros",
+            self,
+            in_channels,
+            out_channels,
+            kernel_size,
+            stride=1,
+            padding=0,
+            output_padding=0,
+            groups=1,
+            bias=True,
+            dilation=1,
+            padding_mode="zeros",
     ) -> None:
         super().__init__(
             in_channels,
@@ -111,11 +111,11 @@ class EqualizedConvTranspose2d(ConvTranspose2d):
         self.scale = np.sqrt(2) / np.sqrt(fan_in)
 
     def forward(self, x: Tensor, output_size: Any = None) -> Tensor:
-	num_spatial_dims = 2
-	output_padding = self._output_padding(
-	    input, output_size, self.stride, self.padding, self.kernel_size,
-	    num_spatial_dims, self.dilation
-	)
+        num_spatial_dims = 2
+        output_padding = self._output_padding(
+            input, output_size, self.stride, self.padding, self.kernel_size,
+            num_spatial_dims, self.dilation
+        )
         return torch.conv_transpose2d(
             input=x,
             weight=self.weight * self.scale,  # scale the weight on runtime
