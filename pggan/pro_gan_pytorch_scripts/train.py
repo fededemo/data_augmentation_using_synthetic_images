@@ -6,11 +6,15 @@ from pathlib import Path
 import torch
 from torch.backends import cudnn
 
-from ..pro_gan_pytorch.networks import load_models
-from ..pro_gan_pytorch.data_tools import ImageDirectoryDataset, get_transform
-from ..pro_gan_pytorch.gan import ProGAN
-from ..pro_gan_pytorch.networks import Discriminator, Generator
-from ..pro_gan_pytorch.utils import str2bool, str2GANLoss
+import sys
+# setting path
+sys.path.append('../pggan')
+
+from pro_gan_pytorch.networks import load_models
+from pro_gan_pytorch.data_tools import ImageDirectoryDataset, get_transform
+from pro_gan_pytorch.gan import ProGAN
+from pro_gan_pytorch.networks import Discriminator, Generator
+from pro_gan_pytorch.utils import str2bool, str2GANLoss
 
 # turn fast mode on
 cudnn.benchmark = True
