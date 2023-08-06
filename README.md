@@ -23,10 +23,10 @@ Below are some sample images from each dataset:
 
 |         | Image1 | Image2 | Image3 |
 |:-------:|:------:|:------:|:------:|
-| Chongqing Pneumoconiosis Detection | <img src="src/pneumoconiosis/1-2.jpg" width="100"> | <img src="src/pneumoconiosis/2-2.jpg" width="100"> | <img src="src/pneumoconiosis/3-2.jpg" width="100"> |
-| NIH Chest X-rays | <img src="src/nih_xray/00001971_000.png" width="100"> | <img src="src/nih_xray/00001974_001.png" width="100"> | <img src="src/nih_xray/00001980_000.png" width="100"> |
-| Human Brain MRI | <img src="src/brain_tumor/1.jpg" width="100"> | <img src="src/brain_tumor/2.jpg" width="100"> | <img src="src/brain_tumor/3.jpg" width="100"> |
-| Diabetic Retinopathy Gaussian Filtered | <img src="src/retinopatia/1.png" width="100"> | <img src="src/retinopatia/2.png" width="100"> | <img src="src/retinopatia/3.png" width="100"> |
+| Chongqing Pneumoconiosis Detection | <img src="src/pneumoconiosis/1-2.jpg" width="150"> | <img src="src/pneumoconiosis/2-2.jpg" width="150"> | <img src="src/pneumoconiosis/3-2.jpg" width="150"> |
+| NIH Chest X-rays | <img src="src/nih_xray/00001971_000.png" width="150"> | <img src="src/nih_xray/00001974_001.png" width="150"> | <img src="src/nih_xray/00001980_000.png" width="150"> |
+| Human Brain MRI | <img src="src/brain_tumor/1.jpg" width="150"> | <img src="src/brain_tumor/2.jpg" width="150"> | <img src="src/brain_tumor/3.jpg" width="150"> |
+| Diabetic Retinopathy Gaussian Filtered | <img src="src/retinopatia/1.png" width="150"> | <img src="src/retinopatia/2.png" width="150"> | <img src="src/retinopatia/3.png" width="150"> |
 
 ## Model Weights
 The weights of the models trained during our study are available for download at the following links. Each link corresponds to a specific dataset used in our study. We also provide the performance of each model on its respective dataset.
