@@ -7,9 +7,9 @@ This repository contains the code, notebooks, and model weights used in our stud
 ## Code and Notebooks
 Here you will find the code and notebooks implementing the Generative Adversarial Networks (GANs), Progressive Growing of Generative Adversarial Networks (PGGAN), and Diffusion Models (DMs) techniques used in our study. We used diffusion models in various ways including Stable Diffusion v1.5, Stable Diffusion v2, Dreambooth, LoRa, and XL. Each of these models has its unique strengths in generating synthetic images, which we leveraged to improve the performance of our ML models.
 
-- [Generative Adversarial Networks (GANs)](**)
-- [Progressive Growing of Generative Adversarial Networks (PGGAN)](**)
-- [Diffusion Models (DMs)](**)
+- [Generative Adversarial Networks (GANs)](https://github.com/fededemo/data_augmentation_using_synthetic_images/blob/main/gans/gan_img_generator_pneumoconiosis.ipynb)
+- [Progressive Growing of Generative Adversarial Networks (PGGAN)](https://github.com/fededemo/data_augmentation_using_synthetic_images/tree/main/gans/pggan)
+- [Diffusion Models (DMs)](https://github.com/fededemo/data_augmentation_using_synthetic_images/tree/main/diffusion)
 
 ## Datasets
 We used the following datasets in our study:
@@ -28,14 +28,16 @@ Below are some sample images from each dataset:
 | Human Brain MRI | <img src="src/brain_tumor/1.jpg" width="150"> | <img src="src/brain_tumor/2.jpg" width="150"> | <img src="src/brain_tumor/3.jpg" width="150"> |
 | Diabetic Retinopathy Gaussian Filtered | <img src="src/retinopatia/1.png" width="150"> | <img src="src/retinopatia/2.png" width="150"> | <img src="src/retinopatia/3.png" width="150"> |
 
-## Model Weights
-The weights of the models trained during our study are available for download at the following links. Each link corresponds to a specific dataset used in our study. We also provide the performance of each model on its respective dataset.
-
-| Model | Dataset | Training Steps |  Performance | Link |
-|-------|---------|----------------|-------------|------|
-| GANs  | Chongqing Pneumoconiosis Detection| ** | *Performance* | [**](#) |
-| PGGAN | Chongqing Pneumoconiosis Detection| ** | *Performance* | [**](#) |
-| DMs   | Chongqing Pneumoconiosis Detection| ** | *Performance* | [**](#) |
+  <!---
+  ## Model Weights
+  The weights of the models trained during our study are available for download at the following links. Each link corresponds to a specific dataset used in our study. We also provide the performance of each model on its respective dataset.
+  
+  | Model | Dataset | Training Steps |  Performance | Link |
+  |-------|---------|----------------|-------------|------|
+  | GANs  | Chongqing Pneumoconiosis Detection| ** | *Performance* | [**](#) |
+  | PGGAN | Chongqing Pneumoconiosis Detection| ** | *Performance* | [**](#) |
+  | DMs   | Chongqing Pneumoconiosis Detection| ** | *Performance* | [**](#) |
+  --->
 
 ## Clustering Code
-To manage the diversity of images within each dataset, we devised a solution that involves extracting features from each image, grouping images into clusters based on feature similarity, selecting representative images from each cluster based on specific criteria, and generating synthetic images for each cluster separately. The code for this process can be found in the [Clustering section of the repository](**).
+To manage the diversity of images within each dataset, we devised a solution that involves extracting features from each image, grouping images into clusters based on feature similarity, selecting representative images from each cluster based on specific criteria, and generating synthetic images for each cluster separately. The code for this process can be found in the [Clustering section of the repository](https://github.com/fededemo/data_augmentation_using_synthetic_images/tree/main/clustering).
