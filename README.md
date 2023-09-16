@@ -1,4 +1,4 @@
-# Data Augmentation using Synthetic Images
+# [Data Augmentation using Synthetic Images](https://github.com/fededemo/data_augmentation_using_synthetic_images/blob/main/documentation/Data%20Augmentation%20using%20Synthetic%20Images.pdf)
 
 This study focuses on the area of Computer Vision, and therefore, we focus on the use of images and classification problems related to them. We propose the generation of synthetic data through modern generative Artificial Intelligence (AI) techniques for images, such as diffusion models, as an alternative to conventional Data Augmentation techniques. We find that models trained in a combination of both types of data, real and synthetic, can achieve better performance to models trained only in real data. This suggests that synthetic data can be a valuable tool for improving the performance of machine learning models for computer vision tasks. We chose GANs, PGGAN, and DMs for this study due to their proven effectiveness in generating high-quality synthetic images.
 
