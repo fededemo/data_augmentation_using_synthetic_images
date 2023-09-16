@@ -1,0 +1,251 @@
+\chapter{Pipeline implementation}
+
+In this chapter are described some of the implementation decisions taken for the different pipeline phases depicted in Figure~\ref{fig:pipeline_diagram}.
+
+As a brief summary of key aspects of each phase:
+\begin{itemize}
+    \item \textbf{Image sampling}: refers to the process of selecting specific images from the larger original dataset. It directly impacts subsequent steps by capturing representative samples that approximate the data distribution, requiring considerations of factors like image size, diversity, and adaptability for future datasets.
+    \item \textbf{Generative model}: refers to the process of first, evaluating generative models by collecting and analyzing information to determine their suitability and second, implementing the chosen models using diverse approaches to train/fine-tune them.
+    \item \textbf{Generate images}: involves ensuring that generated images meet quality and fidelity standards. Also that they are compatible with real-world data, minimizing the domain gap between synthetic and real data for optimal model performance in practical applications.
+    \item \textbf{Combining datasets}: this is about how to balance real and synthetic data to train a classification model, as an excessive reliance on synthetic data can introduce biases or inconsistencies that affect the model's ability to generalize effectively, necessitating careful consideration to strike the optimal balance.
+    \item \textbf{Classification model}: implies the training of the classification model based on the steps and decisions previously taken. 
+\end{itemize}
+
+\section{Image sampling}
+\label{image_sampling}
+
+Image sampling is a critical component for securing high-quality training data, particularly in pipelines where the result of each step heavily influences subsequent ones. The effective execution of this process is essential for capturing representative samples that embody the critical features necessary to closely approximate the underlying data distribution. During this phase, considerations must include a range of factors such as image size, diversity, distribution, complexity, and resolution. The goal is to devise a methodology that is not only effective for the datasets at hand but also adaptable for future collections of data.
+
+One of the primary challenges we encountered was the inherent diversity among images within each dataset. Our work with X-ray images presented limited variations, resulting in a high degree of similarity among samples. However, datasets like MRI (Figure~\ref{fig:sample_images_brain_tumor}) and Retinopathy (Figure~\ref{fig:sample_images_retinopatia}) presented a broader spectrum of image differences, as detailed in Table~\ref{tab:image_diversity}.
+
+\subimport{./tables}{datasets_comparison.tex}
+
+To address the challenge posed by the diversity within each dataset, we devised a solution comprising the following steps:
+
+\begin{itemize}
+  \item Initially, we propose to extract features from each image, with the purpose of transforming them into representative feature vectors or embeddings. To achieve this different approaches were explored:
+    \begin{itemize}
+      \item Using a pretrained EfficientNet model~\cite{efficientnet}.
+      \item Using the recently released CLIP model~\cite{clip}. 
+    \end{itemize}
+
+While GeneCIS~\cite{genecis} was also under consideration, it was ultimately discarded due to challenges related to its implementation. These features served as a basis for subsequent clustering.
+
+  \item Upon extraction of features from all images, we used the Faiss k-means clustering algorithm~\cite{faiss} to group images into clusters based on feature similarity. This process allowed us to group together images with similar content.
+
+  \item For each cluster, we calculated the distances between the cluster centroid and the individual images within it. We then selected the top $N$ images closest to the centroid, thereby ensuring their representativeness of the overall characteristics within the cluster.
+
+  \item To evaluate the consistency and representativeness of the selected images, we assessed the average similarity and standard deviation of similarities within each cluster. Using a predetermined threshold, we prioritized clusters with higher average similarity and lower standard deviation. This method ensured that the chosen images were both indicative and consistent with their respective clusters.
+
+  \item Finally, we employed Stable Diffusion techniques to generate synthetic images for each cluster separately, allowing each model to learn from better representations and generate synthetic images based on more uniform images.
+\end{itemize}
+
+Our proposed solution aimed to manage the diversity of images within each cluster. As a result, it facilitated the generation of higher-quality synthetic images through the selected models. We propose that the models by learning from a more homogeneous set of consistent images could potentially enhance both the quality and coherence of the generated images.
+
+
+\section{Generate model \& Generate images}
+
+In the rapidly evolving landscape of generative models, two primary approaches have gained prominence: GANs and DMs. While GANs are known for their ability to produce high-quality images, they come with the drawbacks of computational intensity and lengthy training processes, making them less suitable for our commercialization objectives. Conversely, DMs have shown remarkable advancements in both generation quality and efficiency, aligning more closely with our goals.
+
+Given this context, our research is directed toward meeting two broad sets of challenges. The first is the generative model assessment, which involves diligently collating, reading, analyzing, and assessing a wealth of information to identify which generative models are most appropriate for our purposes. This step also includes the time-consuming task of implementing these chosen models using various approaches.
+
+The second challenge revolves around the quality and fidelity of generated images. It is crucial to ensure that the synthetic images produced meet established quality and fidelity benchmarks and are compatible with real-world data. Moreover, there is a significant challenge in bridging the domain gap between real and synthetic data to minimize any potential negative impacts on the model's performance in real-world applications.
+
+While we have made considerable progress in both exploring the use of DMs and evaluating synthetic image quality, complete success remains an ongoing objective. In addition to using automated metrics for assessment, another possible approach is to involve human experts in the evaluation process to gain valuable insights into the quality of generated samples.
+
+\subsection{Progressive Growing of Generative Adversarial Networks}
+
+One of the generative techniques analyzed in this study is the Progressive Growing of Generative Adversarial Networks (PGGAN) by Karras et al.~\cite{karras_pggan}. PGGANs are known for their ability to produce high-quality, high-resolution images. In our specific case, our first trial was to generate synthetic chest X-ray images that exhibit pneumoconiosis features, which can be added to the original dataset to improve the classification model's performance.
+
+The implementation of the PGGAN technique was based on an unofficial PyTorch code repository~\cite{proganpytorch}, developed by Karras and collaborators available to the public.
+
+As part of this work we improved the repository to enable the use of pretrained models, this enhancement allowed us to fine-tune the PGGAN model using our chest x-ray dataset more effectively. 
+
+Table~\ref{tab:image_comparison_pggan} presents a comparison of the original images from the Chongqing dataset (a, b, c) with images generated using PGGAN (d, e, f) and images generated using PGGAN fine-tuned with chest X-ray images (g, h, i). The table illustrates how the generated images from both PGGAN and PGGAN fine-tuned with chest X-ray images can potentially enhance the dataset by providing additional examples for the classification model to learn from. By incorporating these generated images, we try to improve the model's ability to detect pneumoconiosis with higher accuracy and efficacy.
+
+\subimport{./tables/image_comparisons}{pggan_image_comparison.tex}
+
+As observed in Table~\ref{tab:image_comparison_pggan}, the quality of the generated images may not be optimal, possibly due to insufficient training. For example, the rib structures in the generated images appear irregular and unnatural, particularly in images (e) and (i), where the ribs seem distorted and not well-defined. This observation suggests that the PGGAN model may require further fine-tuning and additional training data to generate more accurate representations of chest X-ray images exhibiting pneumoconiosis features.
+
+Given these results, the training time insumed and the relatively disappointing performance on the Chongqing dataset, we decided not to pursue PGGAN for the rest of the datasets. To provide some context regarding the time investment, we committed 18 days to training and fine-tuning these models using a dedicated Google Cloud instance equipped with a T4 GPU:
+\begin{itemize}
+    \item 4 days were allocated to training a model exclusively with the Chongqing dataset.
+    \item 7 days were dedicated to training a model exclusively with the Chest X-ray dataset.
+    \item The remaining 7 days were spent on fine-tuning the model initially trained on the Chest X-ray dataset with additional data from the Chongqing dataset.
+\end{itemize}
+Future work might involve further refinement of the PGGAN model and exploration of its potential benefits on a larger and more diverse dataset.
+
+\subsection{Stable Diffusion}
+
+Despite several diffusion models being named for image generation, at the time of this work, only Stable Diffusion was both publicly released and provided code pieces for finetuning. Table~\ref{tab:models_checks} gives a better idea of the evaluated models and our decisions behind SD. Hence our work mainly focuses on using the different versions of SD models for synthetic data generation. 
+
+\subimport{./tables/information}{models_checks.tex}
+
+Within the scope of this study, we employed the Stable Diffusion technique~\cite{stable_diffusion} as a generative method to augment our dataset. This approach not only enhances the diversity and quality of the original training dataset but is also recognized for its proficiency in generating images closely resembling real-world instances. An overview of its arquitecture can be seen at Figure~\ref{fig:sd_diagram}
+
+
+
+\subimport{./figures/diagrams}{sd_diagram.tex}
+
+The initial stage of our investigation involved the implementation of the Stable Diffusion method through the Hugging Face's StableDiffusionImg2ImgPipeline~\cite{huggingfaceImagetoImageGeneration}. The process involved introducing noise and later prompting the model to reconstruct the altered image. This approach enabled us to swiftly conduct testing and generating synthetic data from an initial image.
+
+Subsequently, we explored various models (versions) by adopting the widely employed approach in diffusion models, where images are generated from text using Hugging Face's StableDiffusionPipeline~\cite{huggingfaceTexttoImageGeneration}. This class stores all components from the SD architecture (models, schedulers, and processors presented in Figure~\ref{fig:sd_diagram}) for diffusion pipelines and provides methods for loading, downloading and saving SD models. At inference time the steps followed by the pipeline are described in Figure~\ref{fig:sd_inference}
+
+\subimport{./figures/diagrams}{sd_inference.tex}
+
+The techniques researched and utilized for fine-tuning these models are summarized in the Table ~\ref{tab:version_vs_technique}.
+
+\subimport{./tables/information}{version_vs_technique.tex}
+
+\begin{itemize}
+    \item \textbf{Textual Inversion}~\cite{textual_inversion}: 
+    
+In DMs, a text encoder translates input prompts into embeddings that steer the model's output. This involves tokenizing the input into indexed tokens via a predefined dictionary, and then passing these tokens through the text encoder. The result is a set of unique embedding vectors, accessible through indexing. These vectors serve a dual purpose: they guide a downstream UNet model and work in conjunction with latent image input. This enables the modification of token embeddings to either generate a variety of images or to facilitate the learning of new concepts.
+
+Textual inversion capitalizes on this embedding space to introduce new vocabulary to the text model by using a limited set of example images to fine-tune embeddings that are closely aligned with visual representations, as illustrated in Figure~\ref{fig:textual_inversion_diagram}. This process involves adding new tokens to the existing vocabulary and training the model with representative images. The outcome is a set of novel embedding vectors that encapsulate specific concepts. A designated placeholder string $S$ marks these new concepts, replacing the original tokenized string vector with a newly acquired embedding $v_{*}$. Importantly, this addition does not alter the foundational generative model, preserving its utility for new applications.
+
+In our experiments, Textual Inversion proved to be an efficient and accessible method for fine-tuning SD models. However, as shown in Table~\ref{tab:image_comparison_textual_inversion} in the Appendix, the results were less than optimal, leading us to discontinue further work in this direction.
+
+\subimport{./figures/diagrams}{textual_inversion.tex}
+
+    \item \textbf{Dreambooth}~\cite{ruiz2023dreambooth}: 
+
+As shown in Figure~\ref{fig:dreambooth_diagram} this technique involves refining a text-to-image diffusion model with a small collection of images depicting a subject. This refinement entails pairing the input images with a text prompt encompassing a distinctive identifier and the designated class to which the subject pertains (for instance, ``A [V] MRI''). Concurrently, they employ a class-specific prior preservation loss capitalizing the model's inherent semantic knowledge pertaining to the class, fostering the generation of a varied array of instances associated with the subject's class. This is achieved by incorporating the class name into a text prompt (for example, ``An MRI''), thus encouraging diverse and representative outputs.
+    
+The initial description in the Dreambooth paper explains a method to improve the UNet part of the model while keeping the text encoder unchanged. However, based on an article published from Hugging Face~\cite{dreamboothGuideFinetuning} the text encoder was also adjusted since it has been demonstrated that tweaking the text encoder leads to the most favorable results. This adjustment translates into more realistic images and it reduces the risk of fitting the model too closely to the training data while also improving the model's ability to understand and work with more complex prompts.
+
+In our experiments, this technique has proven itself to be an effective and accessible method for refining SD models. Unlike Textual Inversion, Dreambooth exhibited notably positive outcomes. Our research was primarily dedicated to investigating and enhancing this specific technique, proving to be instrumental in facilitating the learning of new concepts by the SD models with minimal computational burden.
+
+\subimport{./figures/diagrams}{dreambooth.tex}
+
+    \item \textbf{LoRA}~\cite{lora} (in combination with Dreambooth): 
+
+LoRA, which stands for Low-Rank Adaptation of Large Language Models, is a fresh approach devised by Microsoft researchers to address the challenge of refining extensive language models. Coping with the expense of fine-tuning large models like GPT-3, which possess billions of parameters, can be daunting. LoRA introduces a strategy where the original model's weights are kept fixed, and instead, trainable layers (in the form of rank-decomposition matrices) are integrated into each transformer block. This innovation significantly diminishes the count of trainable parameters and the GPU memory prerequisites, as most model weights do not necessitate gradient computations. The researcher's findings indicate that by concentrating on the Transformer attention blocks within expansive language models, employing LoRA for fine-tuning yields comparable quality to full model fine-tuning, all while being notably faster and demanding less computational resources.
+
+While originally introduced for large-language models and showcased through transformer blocks, LoRA's applicability extends beyond these bounds. In the context of fine-tuning Stable Diffusion, LoRA can be effectively implemented within the cross-attention layers, which establish the connection between image representations and corresponding descriptive prompts. The Figure~\ref{fig:lora_sd_diagram} gives a better idea on where are this cross-attention layers present in the SD model architecture. 
+
+When combined with Dreambooth, as documented by Hugging Face~\cite{loraGuideFinetuning}, LoRA demonstrated efficiency in fine-tuning SD models. It is worth noting, however, that the results were not as impressive as when using Dreambooth alone. For our research, we exclusively used the SD XL model variant in combination with LoRA, as it offered to us visually superior results.
+
+\subimport{./figures/diagrams}{lora.tex}
+    
+    \item \textbf{Perfusion}~\cite{tewel2023keylocked} 
+    
+Perfusion, a promising technique introduced recently, aims to address two conflicting goals in personalized text-to-image (T2I) models: (1) Avoiding overfitting to ensure that the model doesn't replicate example images too precisely and (2) Preserving the identity or theme across generated images, even when those images vary in presentation. However, these two goals go against each other since when the model copies the examples too closely, it's good at keeping the idea the same, but it struggles to make new and unique pictures when asked to be creative and vice versa.
+
+The authors propose what they term a "naïve solution" to address both goals. They distinguish between two pathways within the model: the "\textit{K pathway}", which governs the features of the generated content (the \textit{What}), and the "\textit{V pathway}", which dictates the spatial arrangement of these features (the \textit{Where}). To simplify, one part decides where objects should be in the picture, while the other part determines what these objects should look like. By isolating these functions, the model can better balance creativity and consistency. To achieve these objectives effectively, they suggest that whenever the encoded content contains the desired concept, ensure that its cross-attention keys align with those of its broader category, a technique referred to as "\textit{Key Locking}". Furthermore, they aim for the cross-attention values to accurately represent the concept within the multi-resolution latent space. Additionally, they have developed another gated rank-1 approach that enables control over the influence of a learned concept during inference and allows for combining multiple concepts. Figure~\ref{fig:perfusion} illustrates these pathways and the gated rank-1 concept.
+
+As of now, the authors have yet to release the source code for Perfusion, limiting its current applicability.
+
+\subimport{./figures/diagrams}{perfusion.tex}
+
+    \item \textbf{HyperDreamBooth}~\cite{ruiz2023hyperdreambooth} 
+    
+This is a very recent technique introduced during the advanced stages of our work and developed by the same creators of DreamBooth. Their research aims to address the challenges posed by the size and speed of their previous technique while maintaining model quality, editability, and subject faithfulness. As illustrated in Figure~\ref{fig:hdb_diagram} this is achieved through a two-step process: (1) utilizing a HyperNetwork to create an initial estimation of a portion of network weights, which are subsequently (2) enhanced through rapid fine-tuning to capture subject-specific details with high fidelity. This method ensures the preservation of model consistency and style variety while closely approximating the subject's essence and details.
+
+The motivation behind exploring the HyperNetwork approach lies in the understanding that to create highly accurate representations of specific subjects using a predefined generative model, it is imperative to adjust the way the model works. This involves incorporating information about the desired subjects by modifying the model's weights.
+
+Although this technique was originally designed with faces in mind, we decided to investigate its potential. It is important to note that there is no official implementation available, and the current code available is still a work in progress~\cite{hyperdreambooth_implementation}. However, as shown in Table~\ref{tab:image_comparison_hyperdreambooth} in the Appendix, the results obtained from this method were not very promising, leading us to discontinue further exploration in this direction.
+
+\subimport{./figures/diagrams}{hyperdreambooth.tex}        
+    
+\end{itemize}
+
+For more detailed visualizations of the images generated by the discarded techniques, please refer to Section~\ref{sec:discarded_techniques} in the Appendix.
+
+\subsubsection{Stable Diffusion \textit{v}1}
+
+During the initial phase, we utilized the stable-diffusion-v1-5 model~\cite{Runwaymlstablediffusionv15Hugging} from Runway~\cite{runwayml} to introduce varying degrees of noise to our images and we asked the model to reconstruct them. Specifically, we added noise levels ranging from 5 to 20 percent to each image in our dataset over 24 inference steps and, in one instance, over 50 steps. Table~\ref{tab:image_comparison_two_originals_full_width} provides a comparison between the original images from the Chongquing dataset and their synthetic counterparts. 
+
+Although the differences between the original and noise-added images may appear minimal at first glance, closer inspection reveals subtle variations. Each row in the table represents a unique image from our dataset, with noise levels incrementally increasing from left to right across the columns. Also the addition of further noise than 0.15 caused a clear difference in images.
+
+\subimport{./tables/image_comparisons}{sd_noise_image_comparison.tex}
+
+The performance of the model trained on the Chongqing dataset, which was augmented with noise using runwayml/stable-diffusion-v1-5, is outlined in Table~\ref{tab:model_performance_without_fid} in the final chapter on results.
+
+To build upon this initial exploration, we applied the principles of DreamBooth, a technique for personalizing text-to-image diffusion models, as outlined in a guide elaborated by Tryolabs~\cite{tryolabsGuideFinetuning}. Our objective was to expand the model's language-vision dictionary, enabling it to associate new words with specific subjects we wanted to generate.
+
+We started by fine-tuning the Stable Diffusion model using the Chongqing dataset, focusing on the positive cases. We introduced a prompt for these images: ``image of a \textbf{pneumoconiosis} xray'' using model's existing class knowledge through the "\textit{xray}" class. This approach allowed the model to leverage its prior knowledge of the subject class while associating the class-specific instance with the unique identifier.
+
+For each real image in the Chongqing true cases, we generated one synthetic image. The results of this fine-tuning process were promising, with the model demonstrating an enhanced ability to generate novel renditions of a subject in different contexts while maintaining its distinctive features. Furthermore, as evidenced in Table~\ref{tab:model_performance_without_fid} in the final chapter on results, under the title "\textit{Stable Diffusion with Single-Class Fine-Tuning}", the performance of the fine-tuned model improved the base model as outperform the original dataset across all metrics. This advancement affirms the potential of SD as a data augmentation strategy, and underscores the potential of such synthetic data generation techniques in improving ML model performance.
+
+Considering the previous results, we deemed it interesting for this project to involve a medical radiologist with specialized expertise. Her role was to evaluate and validate the authenticity and realism of the synthetically generated images. The radiologist meticulously examined a subset of 30 images, assessing factors including their fidelity to actual X-rays, anatomical precision, and the capability to accurately detect pneumoconiosis. A thorough report detailing the results of this evaluation can be found in the Appendix, specifically within Section~\ref{sec:expert_eval}.
+
+In addition, we attempted multi-class fine-tuning instead of single-class using the same dataset, with the objective of enhancing the model's capacity to differentiate between instances of pneumoconiosis and non-cases. To clarify single-class refers to fine-tune using only the positive cases whereas multi-class refers to fine-tune the model using both classes, positive and negative. We generated one synthetic image for each real image in the Chongqing true cases. However, the results did not meet our expectations and are outlined in Table~\ref{tab:model_performance_without_fid} in the results chapter, under the title "\textit{Stable Diffusion with Multi-Class Fine-Tuning}".
+
+\subimport{./tables/image_comparisons}{sd_dreambooth_v1_image_comparison.tex}
+
+Table~\ref{tab:image_comparison_dreambooth_combined} presents a comprehensive comparison between the authentic images from the Chongqing real cases and their corresponding synthetic versions generated by the two distinct model fine-tuning approaches: single-class and multi-class fine-tuning. The results show a noticeable disparity in the quality of generated images. Specifically, the images produced through single-class fine-tuning exhibit a higher level of quality compared to those generated via multi-class fine-tuning. Notably, the single-class fine-tuning outperforms in terms of visually assessing ribs, whereas the multi-class fine-tuning portrays anomalies in arm appearance and demonstrates significant variation in lung size.
+
+Building on our experience with the Chongqing dataset, we moved into the application of SD to the other medical imaging contexts described before, continuing our work by fine-tuning the Stable Diffusion model using the Glioma class of the Human Brain MRI Dataset. The prompt used for these images was ``an image of a \textbf{glioma-brain-tumor} MRI'', using once more model's prior concepts about MRI and allowing the model to utilize its previous knowledge of the class while associating the class-specific instance with the unique identifier. 
+
+For the MRI dataset we doubled the size of each Glioma class by generating new images, however, due to the diverse MRI scan views within the dataset (top-down, rear, left profile, right profile, etc.) the quality of the generated images was not satisfactory. We believe this diversity introduced substantial noise and confusion for the SD model, impeding its ability to generate coherent and realistic synthetic images.  As depicted in Table~\ref{tab:brain_image_comparison_dreambooth_combined}, the Stable Diffusion v1 with Dreambooth approach generates synthetic Glioma images that exhibit an invariant perspective. This invariant perspective is inconsistent with the diverse viewing angles present in the original Glioma images. 
+
+As a response to the mentioned problem an intermediate approach was executed based on image clustering, as detailed in Section~\ref{image_sampling}. Our solution of clustering proved to reduce the diversity of MRI views, potentially enabling SD to generate higher-quality images by learning from more consistent and uniform MRI views. This is can be observed with the synthetic images generated from multiple perspectives and more accurately, reflecting the original dataset's diversity.
+
+\subimport{./tables/image_comparisons}{brain_dreambooth_image_comparison.tex}
+
+In a similar vein, our efforts with the Diabetic Retinopathy dataset to generate synthetic images of mild retinopathy were met with challenges. At this time the prompt used was ``an image of a \textbf{mild} retinopathy'', making use again of model's prior concepts. The results were not satisfactory, and in some instances, the images generated even include two retinas, as can be seen in Table~\ref{tab:retinopatia_image_comparison_dreambooth_combined}. These challenges appear to stem from the complexity of the retinal structures and the specific characteristics of mild retinopathy, mirroring the obstacles faced with the MRI dataset.
+
+\subimport{./tables/image_comparisons}{retinopatia_dreambooth_image_comparison.tex}
+
+Nonetheless, despite the noticeable improvement in image generation quality, the SD \textit{v}1 with Dreambooth and using Clustering strategy failed to outperform the original SD \textit{v}1 with Dreambooth in terms of classification metrics. This outcome emphasizes that improved visual fidelity of synthetic images does not necessarily translate to better classification performance, indicating the complexity and challenges in working with diverse medical datasets.
+
+The results of the clustering strategy will be discussed in the results chapter (Table~\ref{tab:brain_results_comparison} under "Stable Diffusion v1 Dreambooth Clustering"). A parallel analysis for the Diabetic Retinopathy dataset can be found in the results chapter as well, under Table~\ref{tab:retinopatia_results_comparison}, where the challenges and outcomes closely resemble those encountered with the MRI dataset.
+
+\subsubsection{Stable Diffusion \textit{v}2}
+
+In our research, we also explored stable-diffusion-2-1~\cite{StabilityAIstablediffusionv21Hugging} from Stability AI~\cite{stabilityai} for the generation of synthetic medical images. Although the \textit{v}2 of this model represents a departure from its predecessor, with modifications to the CLIP model in the text encoder for increased accuracy and the inclusion of a depth model, it did not fulfill the specific requirements of our study.
+
+The orientation of SD \textit{v}2.1 towards photorealism, while a significant advancement in certain contexts, did not align with our needs, as the dataset used for training did not seem to fit the specific styles required in medical images. Furthermore, the conceptual understanding of medical themes within SD \textit{v}2.1 appeared to be less refined compared to earlier versions, leading to a decrease in the quality of generated images as depicted in Table~\ref{tab:pneumo_image_comparison_dreambooth_v2}. 
+
+In conclusion despite the underlying improvements and the potential for future enhancements, the immediate application of SD \textit{v}2.1 within our project yielded results that were not satisfactory. Consequently, our research necessitated the continued utilization of earlier versions and alternative models, which demonstrated a more suitable alignment with the complexities of medical image synthesis.
+
+\subimport{./tables/image_comparisons}{pneumo_dreambooth_v2_image_comparison.tex}
+
+\subsubsection{Stable Diffusion XL}
+
+The stable-diffusion-xl-base-1.0~\cite{StabilityAIstablediffusionXLHugging} model, introduced also by Stability AI along with the research conducted by D. Podell et al.~\cite{sdxl}, builds upon foundational diffusion models. This model incorporates several noteworthy enhancements. For instance, it employs a heterogeneous distribution of transformer blocks within the architecture of the UNet~\cite{unet}. Additionally, it leverages powerful pre-trained text encoders to bolster its capabilities. Notably, the SDXL model boasts a substantial parameter count of 2.6 billion, signifying its complexity and potential. One of its novel contributions is the incorporation of micro-conditioning techniques, including size-conditioning to modify the appearance of an output corresponding to a given prompt. An overview of its architecture can be seen in Figure~\ref{fig:xl_diagram}.
+
+\subimport{./figures/diagrams}{xl_diagram.tex}  
+
+However, due to the substantial scale of the model, fine-tuning is only achievable through the utilization of the LoRA technique and in combination once more with DreamBooth. This technique has demonstrated commendable performance in terms of training times and computing costs, although accompanied by the limitation of producing results that may not exhibit the same level of quality. Consequently, even when employing a more advanced model like SDXL with the LoRA technique on medical datasets, the outcomes were not optimal.
+
+Although this combination outperformed earlier iterations of SD models and introduced innovative functionalities, the images generated within our specific medical context were of unsatisfactory quality. The unique characteristics of medical datasets, coupled with the constant evolution of the underlying architecture, did not align well with the intricacies involved in synthesizing medical images. As a result, we persisted in relying on previous model versions and alternative approaches that demonstrated a better fit for addressing our specific requirements. Table ~\ref{tab:image_comparison_dreambooth_xl} gives a clear idea of what was mentioned before. 
+
+\subimport{./tables/image_comparisons}{dreambooth_xl_image_comparison.tex}
+
+The XL architecture, as presented in Figure~\ref{fig:xl_diagram}, comes with a second model called "\textit{Refiner}"~\cite{StabilityAIstablediffusionXLRefinerHugging} precisely for a more refined end in images using a two-stage pipeline when generating them. First, the base XL model is used to generate latents of the desired output size. In the second step a specialized high-resolution model is used, applying an "\textit{img2img}" technique to the latents generated in the first step, using the same prompt. This technique is slightly slower than the regular one, as it requires more function evaluations. However this only gave to the images cartoon-like aspect and hence this step was removed. Some example images generated by this two-stage approach can be seen in Table~\ref{tab:image_comparison_dreambooth_xl_refiner} within the Appendix. 
+
+\subsubsection{Problem: Complexity of Medical Concepts and Lack of Pre-existing Visual Priors}
+
+The application of the different techniques methods in image generation for specific medical conditions like mild retinopathy, pneumoconiosis chest X-ray, or glioma brain tumor brings up two significant challenges:
+
+\begin{enumerate}
+    \item \textbf{Complexity of Medical Concepts:} Each medical condition carries a unique set of complexities and variations that the model needs to understand. For instance, recognizing a glioma brain tumor involves understanding its appearance in diverse patient groups, various disease progression stages, and different MRI settings. Without such knowledge, the model may fail to generate accurate and clinically meaningful images.
+
+    \item \textbf{Lack of Pre-existing Visual Priors:} The model might not have a pre-existing "visual prior" or conceptual understanding of specific medical conditions. This is due to the likelihood that these particular conditions were underrepresented or not present at all in the model's initial training data. Without a robust prior, the model may not accurately generate images of these medical conditions.
+\end{enumerate}
+
+To visualize the different models' existing priors and what we have previously commented, the Table~\ref{tab:sample_images_priors_sd1}, Table~\ref{tab:sample_images_priors_sd2} and Table\ref{tab:sample_images_priors_sdxl} show their current concept understanding for the worked datasets across different SD versions.
+
+\subimport{./tables/sample_images_datasets}{priors_concepts_sd1.tex}
+\subimport{./tables/sample_images_datasets}{priors_concepts_sd2.tex}
+\subimport{./tables/sample_images_datasets}{priors_concepts_sdxl.tex}
+
+\section{Combining datasets}
+
+Combining real and synthetic images for training a classification model introduces several challenges that require careful consideration. One of the main issues is determining the optimal balance between real and synthetic data. While synthetic data augmentation can enhance the diversity of the training set, an excessive reliance on synthetic data may introduce biases or inconsistencies that hinder the model's generalization capability. Striking the right balance between real and synthetic data is crucial to avoid overfitting or under-representing certain real-world scenarios.
+
+Our own study did not primarily focus on a comprehensive evaluation of these challenges. Azizi et al.'s work~\cite{azizi2023synthetic} offers critical insights that underscore the crucial balance between image quality and diversity. Specifically, they found that models exclusively trained on synthetic data fell short in performance when benchmarked against those trained on real-world data, especially in the context of ImageNet classification tasks. 
+
+We recognize the importance of this phase, which holds weight comparable to other aspects of the research process. However, a thorough examination of this stage would entail significant effort, involving rigorous testing and evaluation to ascertain the optimal mix of synthetic and real images. Such an endeavor could feasibly be a separate research project. Given these considerations, we opted for a straightforward strategy: we doubled the size of the selected classes while maintaining a consistent methodology throughout.
+
+\section{Classification Model}
+
+In this study, we used Cogniflow to develop classification models aimed at solving three distinct medical challenges: pneumoconiosis detection, brain tumor identification, and diabetic retinopathy classification. The datasets employed for these tasks are the Chongqing dataset for pneumoconiosis, the Human Brain MRI dataset for brain tumors, and the Diabetic Retinopathy dataset for retinopathy classification.
+
+\subimport{./tables}{classification_models_comparison.tex}
+
+It is crucial to clarify that the primary aim of our project is not the optimization or fine-tuning of these classification models for their respective medical tasks. Rather, our central focus lies in the assessment of data augmentation techniques. The models, as summarized in Table \ref{tab:cogniflow_model_summary}, were automatically selected by Cogniflow for each dataset. We deliberately kept the model parameters consistent across the different medical tasks to isolate and evaluate the impact of data augmentation on model's performance. This methodology provides a controlled environment for comparison and assessment.
+
+For those interested in more granular details of the classification models, please refer to Appendix~\ref{app:technical_details}.

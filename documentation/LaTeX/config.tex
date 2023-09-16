@@ -1,0 +1,130 @@
+%for algorithm pseudocode
+%\usepackage{amsmath}
+\usepackage[linesnumbered,ruled]{algorithm2e}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{graphicx}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{authblk}
+\usepackage{url}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{tabularx}
+\usepackage{geometry}
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\geometry{margin=1in}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage[export]{adjustbox}
+\usepackage{import}
+\usepackage{float}
+%\usepackage[caption=false]{subfig}
+
+%%ORT
+%metadata para la ORT
+\usepackage[unicode, pdftex]{hyperref}
+\hypersetup{ 
+ pdfauthor={Federico de Leon, Mauricio Repetto},
+ pdftitle={Data Augmentation usando imágenes
+sintéticas},
+ pdfsubject={Tesis de Maestría},
+ pdfkeywords={}
+}
+
+%%%%%%%%%%%%%%%%%%% http://tex.stackexchange.com/a/103290
+%cambio de formato de titulos
+\usepackage{titlesec}
+
+\titleformat{\chapter}[display]
+{\normalfont\huge\bfseries}{}{20pt}{\Huge}
+
+\titleformat{\section}
+{\normalfont\fontsize{20}{0}\bfseries}{\thesection}{1em}{}
+
+\titleformat{\subsection}
+{\normalfont\fontsize{18}{0}\bfseries}{\thesubsection}{1em}{}
+
+\titleformat{\subsubsection}
+{\normalfont\fontsize{15}{0}\bfseries}{\thesubsubsection}{1em}{}
+
+\titleformat{\paragraph}
+{\normalfont\fontsize{13}{0}\bfseries}{}{1em}{}%no se muestra el numero, para agregarlo incluir \theparagraph
+
+\titleformat{\subparagraph}
+{\normalfont\fontsize{11}{0}\bfseries}{}{1em}{}%no se muestra el numero, para agregarlo incluir \thesubparagraph
+
+%espacios despues de titulos
+%defaults en http://ctan.dcc.uchile.cl/macros/latex/contrib/titlesec/titlesec.pdf dentro de Standard Classes
+\titlespacing*{\chapter}        {0pt}{10pt}{40pt}
+\titlespacing*{\section}        {0pt}{3.5ex plus 1ex minus .2ex} {2.3ex plus .2ex}
+\titlespacing*{\subsection}     {0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+\titlespacing*{\subsubsection}  {0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+\titlespacing*{\paragraph}      {0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+\titlespacing*{\subparagraph}   {0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%posición de la numeración
+\usepackage{fancyhdr}
+\fancypagestyle{plain}{% Redefining plain page style
+  \fancyhf{} %clear all header and footer fields
+  \fancyfoot[RO]{\thepage}
+}%
+\fancyhf{} %clear all header and footer fields
+\fancyfoot[RO]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\pagestyle{fancy}
+
+\setlength{\parskip}{1em} % Add space between paragraphs
+
+
+%%para los capítulos
+\makeatletter
+\def\@makechapterhead#1{%
+  \vspace*{50\p@}%
+  {\parindent \z@ \raggedright \normalfont
+    \ifnum \c@secnumdepth >\m@ne
+        \huge\bfseries \space \thechapter\space
+    %    \par\nobreak
+    %    \vskip 20\p@
+    \fi
+    \interlinepenalty\@M
+    \Huge \bfseries #1\par\nobreak
+    \vskip 40\p@
+  }}
+  \makeatother
+
+%%Nombre del índice tabla de contenido
+%%Si babel está activo lo pisa
+\renewcommand{\contentsname}{Table of Contents}
+
+%%para incluir imagenes
+\usepackage{graphicx}
+
+%%para la bibliografía
+%%cambia el nombre
+%%\renewcommand\bibname{Referencias Bibliográficas}
+%%la agrega al indice
+\usepackage[nottoc,numbib]{tocbibind}
+
+%%%%%%%%%%%%%%%%%% impide que se separe un parrafo en dos paginas si es menor a 3 lineas
+%http://tex.stackexchange.com/a/21985
+\widowpenalties 4 10000 10000 5000 0
+\raggedbottom
+
+%%%%%%%%%%%%%%%%%% permite usar ifthenelse
+%http://tex.stackexchange.com/a/58629
+\usepackage{xifthen}
+
+%%%%%%%%%%%%%%%%% referencias con nombre y numero
+%http://tex.stackexchange.com/a/121871
+\newcommand*{\fullref}[2][]{
+\ifthenelse{\equal{#1}{}}
+{\hyperref[{#2}]{\ref*{#2} \nameref*{#2}}}
+{\hyperref[{#2}]{\ref*{#2} {#1}}}
+}
+
+%%%%%%%%%%%%%%%% proxima linea en \item y otros casos
+\newcommand*{\nextLine}[0]{\mbox{}\\}

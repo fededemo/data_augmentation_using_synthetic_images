@@ -1,0 +1,32 @@
+\documentclass[12pt,a4paper,oneside]{book}
+% \usepackage[showframe]{geometry}
+
+\def\tabularxcolumn#1{m{#1}}
+
+%\documentclass[12pt,a4paper,oneside]{book}
+%FORMATO poner metadata
+
+\input{config.tex}
+%\input{config-custom.tex}
+
+\makeindex
+\usepackage{pifont}
+\usepackage{xcolor}
+\newcommand{\cmark}{\textcolor{green!80!black}{\ding{51}}}
+\newcommand{\xmark}{\textcolor{red}{\ding{55}}}
+\begin{document}\renewcommand{\arraystretch}{1.2}
+
+
+
+\import{main/}{0-titulo}
+
+\import{main/}{1-abstract}
+\import{main/}{2-content}
+
+\bibliographystyle{IEEEtran}
+\bibliography{biblio}
+
+\import{main/}{3-anexos}
+
+\end{document}
+

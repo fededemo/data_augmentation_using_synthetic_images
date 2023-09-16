@@ -1,0 +1,163 @@
+
+\chapter{Appendix}
+
+\section{Expert Evaluation of Pneumoconiosis Generated Images}
+\label{sec:expert_eval}
+
+In order to gain insights into the realism and quality of our generated images, we solicited the expertise of a medical radiologist. 31 images, were subjected to a thorough examination. The evaluation was structured around four questions:
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{|p{5cm}|c|c|c|}
+\hline
+\textbf{Question} & \textbf{Yes} & \textbf{No} & \textbf{Uncertain/Doubtful} \\
+\hline
+Do they seem like real X-rays? & 31 & 0 & 0 \\
+\hline
+Do the images seem to be of a person effectively? & 31 & 0 & 0 \\
+\hline
+Are there any malformations, strange bones, or anomalies in them? & 0 & 31 & 0 \\
+\hline
+Is pneumoconiosis identifiable? & 4 & 24 & 3 \\
+\hline
+\end{tabular}
+\caption{Summary of the radiologist's responses to the posed questions.}
+\end{table}
+
+\subsection{Observations and Interpretations}
+
+In examining the images, the radiologist noted some recurring patterns that they termed as "errors." The middle thirds of both lungs in the images appear more white ("subexposed") than other areas. This inconsistency could complicate diagnosis due to the uneven distribution of exposure.
+
+The majority of the images show a rightward rotation. This rotation could cause the left hilum to be more prominently visible. Interestingly, in these images, the right hilum is consistently emphasized, a characteristic usually associated with pathological conditions or leftward rotation.
+
+Another noteworthy observation is the overexposure of the lower third of the right side. This could be an optical phenomenon, where the darker appearance of the lower area is due to the lighter ("white") appearance of the areas above.
+
+The radiologist hypothesized that these recurring patterns could potentially be artifacts from the original dataset used in the image generation process.
+
+\subsection{Conclusion}
+
+The expert evaluation reveals that, overall, the generated images exhibit a high level of realism and accurately represent the human anatomy. However, the presence of recurrent patterns, interpreted as "errors," could introduce diagnostic challenges. Among the generated images, the presence of pneumoconiosis was questionable in some instances.
+
+It is critical to acknowledge that these "errors" might be an inherent limitation of the original dataset used to train the model. Despite their overall realism, certain features in the generated images—such as the overemphasized right hilum and the consistent rightward rotation—could potentially mislead non-expert observers.
+
+\section{Classification Models Technical Details}
+\label{app:technical_details}
+
+In this appendix, we present the technical details involved in the creation of the different baseline classification models for the different datasets.
+
+\subsection{Chongqing Dataset}
+
+For pneumoconiosis detection using the Chongqing dataset the following steps were undertaken:
+
+\begin{itemize}
+    \item \textbf{Data Preprocessing:} The Chongqing dataset was preprocessed, which included resizing images to 512x512. The dataset, already split into training and test sets, was further subjected to normalization and consistent image orientation. To balance the class distribution, the dataset was augmented as necessary.
+
+    \item \textbf{Model Selection and Training:} With the help of Cogniflow's No-Code AI, we selected the Feed-Forward Neural Network (FFNN) as the classification model. This model, vectorized by InceptionResNetV2, was found to be appropriate for the task. The model took approximately 0 hours, 3 minutes, and 41 seconds to run.
+
+    \item \textbf{Configuration Parameters:} The model was configured as follows:
+    \begin{itemize}
+        \item Learning Rate: 0.001
+        \item Batch Size: 64
+        \item Max Epochs: 300
+        \item Optimizer: Adam
+        \item Kernel Regularizer: L2
+        \item Kernel Regularizer Value: 0.02
+        \item Hidden Layers: [256, 256, 256, 256]
+        \item Activations: ['relu', 'relu', 'relu', 'relu']
+        \item Batch Normalization: False
+    \end{itemize}
+
+    \item \textbf{Data Augmentation:} Due to the limited data in the Chongqing dataset, we applied generative AI techniques to generate synthetic data. The synthetic data served to augment the original dataset, resulting in a more diverse and balanced training dataset for the classification model.
+
+    \item \textbf{Evaluation:} The performance of the classification model was evaluated using the test set from the Chongqing dataset. Macro averages of precision, recall, F1-score, and accuracy were utilized to assess the effectiveness
+
+    \item \textbf{Comparison:} The model trained with synthetic data showed a slight improvement in all metrics.
+\end{itemize}
+
+% ################## ver si ésto ponerlo o sacarlo ##################
+% The performance of the model trained on the original dataset was compared with that of the model trained on the augmented dataset. This comparison enabled us to understand the impact of synthetic data, generated through generative AI techniques, on model performance.
+% \end{itemize}
+
+% By following these steps, we aimed to create a robust classification model that could effectively detect pneumoconiosis from chest X-ray images, overcoming the challenges posed by the scarcity of data in the original Chongqing dataset.
+
+
+%\subimport{./content/tables}{melanoma_results_comparison.tex}
+
+\subsection{Human Brain MRI Dataset}
+
+For brain tumor detection using the Human Brain MRI dataset the following steps were undertaken:
+
+\begin{itemize}
+    \item \textbf{Data Preprocessing:} The Human Brain MRI dataset was preprocessed, which included resizing images to 300x300. The dataset was already split into training and test sets and was further normalized for consistent image quality.
+
+    \item \textbf{Model Selection and Training:} We used Cogniflow's No-Code AI to select the Support Vector Classifier (SVC) with a radial basis function (rbf) kernel. The images were vectorized using the Xception model. This selection was found to be well suited for the task at hand. 
+
+    \item \textbf{Configuration Parameters:} The model was configured with the following parameters:
+    \begin{itemize}
+        \item Gamma: scale
+        \item Kernel: rbf
+        \item C: 10
+        \item Maximum Iterations: 1000
+        \item Tolerance: 0.01
+        \item Random State: 123
+    \end{itemize}
+    
+    \item \textbf{Data Augmentation:} We applied generative AI techniques to generate synthetic data. The synthetic data served to augment the original dataset, resulting in a more diverse and balanced training dataset for the classification model. This augmentation was performed both for the class with the least instances and across all classes.
+    
+    \item \textbf{Evaluation:} The performance of the model was evaluated using the test set from the Human Brain MRI dataset. Macro averages of precision, recall, F1-score, and accuracy were utilized to assess the effectiveness of tumor detection.
+    
+    \item \textbf{Comparison:} The model trained with synthetic data did not showed an improvement in the metrics.
+    
+
+\end{itemize}
+
+\subsection{Diabetic Retinopathy Gaussian Filtered Dataset}
+\label{app:technical_details_retinopathy}
+
+For eye's retinopathy detection using the Diabetic Retinopathy Gaussian Filtered dataset, the following steps were undertaken:
+
+\begin{itemize}
+    \item \textbf{Data Preprocessing:} The Diabetic Retinopathy Gaussian Filtered dataset was preprocessed, which involved resizing images to 300x300. The dataset, already split into training and test sets, was further normalized to maintain consistent image quality.
+
+    \item \textbf{Model Selection and Training:} Logistic Regression was chosen as the classification model using Cogniflow's No-Code AI. The images were vectorized using the InceptionV3 model. This model was found to be appropriate for the task, and it took approximately 0 hours, 8 minutes, and 18 seconds to run.
+
+    \item \textbf{Configuration Parameters:} The model was configured with the following parameters:
+    \begin{itemize}
+        \item C: 10
+        \item L1 ratio: 0.5
+        \item Maximum Iterations: 300
+        \item Multi Class: ovr
+        \item Penalty: elasticnet
+        \item Random State: 123
+        \item Solver: saga
+    \end{itemize}
+
+    \item \textbf{Data Augmentation:} We applied generative AI techniques to generate synthetic data. The synthetic data served to augment the original dataset, resulting in a more diverse and balanced training dataset for the classification model. This augmentation was performed both for the class with the least instances and across all classes.
+
+    \item \textbf{Evaluation:} The performance of the model was evaluated using the test set from the Diabetic Retinopathy Gaussian Filtered dataset. Macro averages of precision, recall, F1-score, and accuracy were utilized to assess the effectiveness of retinopathy detection. 
+
+    \item \textbf{Comparison:} The model trained with synthetic data did not showed an improvement in the metrics. 
+
+\end{itemize}
+
+\section{Discarded techniques results}
+\label{sec:discarded_techniques}
+
+We present an overview of the outcomes achieved through our experimentation with various fine-tuning approaches. However, these outcomes were not integrated into our work due to their under-performance in generating images when compared to the quality of the original images. These were:
+\begin{itemize}
+    \item \textbf{Textual inversion} using Stable Diffusion v1.5 (Table~\ref{tab:image_comparison_textual_inversion}). While the generated images displayed a certain degree of resemblance to those in the dataset, the finetuned model exhibited an inability to faithfully replicate identical outcomes. Instead, it exhibited tendencies to introduce hallucinatory details, potentially stemming from its creative interpretation of the provided prompt.
+
+\subimport{/content/tables}{textual_inversion_sd1.tex}
+
+    \item \textbf{HyperDreamBooth} using Stable Diffusion v1.5 (Table~\ref{tab:image_comparison_hyperdreambooth}). It is evident that this technique would benefit from further refinement, both in terms of time investment for enhanced implementation and empirical assessment given its recent discovery. The images presented in the corresponding table fell notably short of anticipated outcomes, underscoring the necessity for a more effective parameter configuration during the finetuning process.
+
+\subimport{/content/tables}{hyperdreambooth_sd1.tex}
+\end{itemize}
+
+The results for these techniques exhibited inferior performance when compared to the DreamBooth technique. This was observed both when utilizing out-of-the-box scripts and when employing similar training epochs.
+
+\begin{itemize}
+    \item \textbf{Stable Diffusion XL Refiner Model}: As mentioned before we can use a two-stage pipeline when generating images by applying two models however this technique proved to be not appropriate for our purposes as depicted in Table~\ref{tab:image_comparison_dreambooth_xl_refiner}
+    
+\subimport{/content/tables/image_comparisons}{dreambooth_xl_refiner_image_comparison.tex}
+\end{itemize}
