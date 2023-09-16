@@ -1,0 +1,24 @@
+\chapter{Results}
+
+In this chapter we present the outcomes derived from the application of distinct generative models across a variety of datasets, along with an analysis of the impact of synthetic data on the performance of our classification models.
+
+A short performance improvement was achieved exclusively in the Chongqing dataset. This success was realized by utilizing Stable Diffusion \textit{v1} with DreamBooth and single-class fine-tuning, as detailed in Table~\ref{tab:model_performance_without_fid}. 
+
+Contrarily, the experiments conducted on the Human Brain MRI Dataset did not yield improvements. As shown in Table~\ref{tab:brain_results_comparison}, the overall results reported either equal or worse metrics compared to the original data. This observation holds true across the entirety of our experimentation.
+
+A similar outcome was observed with the Diabetic Retinopathy dataset, where none of the experiments led to improved results, as exhibited in Table~\ref{tab:retinopatia_results_comparison}.
+
+Some possible reasons behind these varied outcomes, and the specific success with the Chongqing dataset, will be interpreted and discussed further in the conclusion section.
+
+\section{Chongqing Dataset}
+
+\subimport{./tables/results}{pneumoconiosis_results_comparison.tex}
+
+\section{Human Brain MRI Dataset}
+
+\subimport{./tables/results}{brain_results_comparison.tex}
+
+\section{Diabetic Retinopathy Gaussian Filtered}
+
+\subimport{./tables/results}{retinopatia_results_comparison.tex}
+

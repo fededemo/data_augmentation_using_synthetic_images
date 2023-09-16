@@ -1,0 +1,52 @@
+\begin{table}[H]
+\centering
+\begin{tabularx}{\linewidth}{@{}l>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X@{}}
+\toprule
+ & \textbf{Chongqing} & \textbf{Human Brain MRI} & \textbf{Diabetic Retinopathy} \\
+\midrule
+\textbf{Model} & FFNN & SVC (rbf) & Logistic Regression \\
+\midrule
+\textbf{Learning Rate} & 0.001 & NA & NA \\
+\midrule
+\textbf{Batch Size} & 64 & NA & NA \\
+\midrule
+\textbf{Max Epochs} & 300 & NA & NA \\
+\midrule
+\textbf{Optimizer} & Adam & NA & NA \\
+\midrule
+\textbf{Kernel Regularizer} & L2 & NA & NA \\
+\midrule
+\textbf{Kernel Regularizer Value} & 0.02 & NA & NA \\
+\midrule
+\textbf{Hidden Layers} & [256, 256, 256, 256] & NA & NA \\
+\midrule
+\textbf{Activations} & ['relu', 'relu', 'relu', 'relu'] & NA & NA \\
+\midrule
+\textbf{Batch Normalization} & False & NA & NA \\
+\midrule
+\textbf{Gamma} & NA & scale & NA \\
+\midrule
+\textbf{Kernel} & NA & rbf & NA \\
+\midrule
+\textbf{C} & NA & 10 & 10 \\
+\midrule
+\textbf{Maximum Iterations} & NA & 1000 & 300 \\
+\midrule
+\textbf{Tolerance} & NA & 0.01 & NA \\
+\midrule
+\textbf{Random State} & NA & 123 & 123 \\
+\midrule
+\textbf{L1 ratio} & NA & NA & 0.5 \\
+\midrule
+\textbf{Multi Class} & NA & NA & ovr \\
+\midrule
+\textbf{Penalty} & NA & NA & elasticnet \\
+\midrule
+\textbf{Solver} & NA & NA & saga \\
+\midrule
+\textbf{Evaluation} & Improved with synthetic data & No improvement with synthetic data & No improvement with synthetic data \\
+\bottomrule
+\end{tabularx}
+\caption{Summary of Classification Models for Different Datasets}
+\label{tab:cogniflow_model_summary}
+\end{table}

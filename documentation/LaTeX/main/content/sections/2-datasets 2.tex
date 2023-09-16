@@ -1,0 +1,60 @@
+\chapter{Datasets}
+
+For our research into enhancing image classification through synthetic data augmentation, we utilized four datasets, primarily comprising chest X-ray and other medical images with diverse composition as summarized in Table~\ref{tab:datasets_summary}.
+
+\subimport{./tables/information}{datasets_summary.tex}
+
+\section{Chongqing Pneumoconiosis Detection}
+
+The \textit{Chongqing Pneumoconiosis Detection Dataset}~\cite{neumoconiosis_paper} is designed to facilitate the detection of pneumoconiosis, an occupational lung disease caused by inhaling mineral dust. The dataset includes 706 images, 142 of which are positive cases of pneumoconiosis. The goal of this dataset is to enhance detection and early diagnosis of pneumoconiosis. 
+
+Examples of these images are presented in Figure~\ref{fig:sample_images_pneumoconiosis}.
+
+\subimport{./figures/sample_images_datasets}{chongqing.tex}
+
+\subsection{NIH Chest X-rays}
+
+The \textit{NIH Chest X-rays Dataset}~\cite{nih_chest_xrays_paper} comprises 108,948 chest X-ray images with corresponding disease labels for 32,717 patients. The aim of this dataset is to aid in detection and computer-aided diagnosis of diseases seen in chest X-rays. It provides a vast resource for training and validation of deep learning models in the medical field.
+
+Each dataset, NIH and Chongqing, served a unique purpose in our research. Both were used for pretraining models and generating new images. Specifically, we utilized the Chongqing dataset to train and validate our baseline model for the detection and classification of pneumoconiosis. We aim to use NIH dataset in pneumoconiosis detection to compensate the limitations of the Chongqing dataset. This additional dataset contributed to a more comprehensive range of images for training, allowing the model to learn from various pneumoconiosis manifestations and improving its detection capabilities.
+
+You can see some of these images at Figure~\ref{fig:sample_images_chestxray}
+
+\subimport{./figures/sample_images_datasets}{chestxray.tex}
+
+\section{Human Brain MRI}
+
+The \textit{Human Brain MRI Dataset}~\cite{brain_mri_dataset} is crucial for the detection and classification of brain tumors. It merges three separate datasets—figshare, SARTAJ, and Br35H—resulting in 7,023 human brain MRI images. These images are classified into four categories:
+
+\begin{itemize}
+  \item Glioma
+  \item Meningioma
+  \item No Tumor
+  \item Pituitary
+\end{itemize}
+
+Because the original images varied in size, we performed a pre-processing phase to resize all images to a uniform size of 300x300 pixels. Additionally, to manage the dataset size, we randomly reduced the image count in each class by 80 percent. This smaller dataset was utilized for effective data augmentation during model training. 
+
+Examples of these images are presented in Figure~\ref{fig:sample_images_brain_tumor}.
+
+\subimport{./figures/sample_images_datasets}{brain_tumor.tex}
+
+\section{Diabetic Retinopathy Gaussian Filtered}
+
+Diabetic Retinopathy is a retinal disease caused by diabetes and can lead to blindness. We utilized a dataset originated from the APTOS 2019 Blindness Detection dataset~\cite{diabetic_retinopathy_dataset}, which contains Gaussian filtered retina scan images optimized for diabetic retinopathy detection. These images have been resized to 224x224 pixels to ensure compatibility with various pre-trained deep learning models.
+
+The images in this dataset are organized according to the severity or stage of diabetic retinopathy:
+
+\begin{itemize}
+  \item No DR
+  \item Mild
+  \item Moderate
+  \item Severe
+  \item Proliferate DR
+\end{itemize}
+
+To match our model's input requirements and facilitate a balanced evaluation, we further processed this dataset by resizing the images to 300x300 pixels and splitting it into training and test sets, using an 80-20 split.
+
+Examples of these images are presented in Figure~\ref{fig:sample_images_retinopatia}.
+
+\subimport{./figures/sample_images_datasets}{retinopatia.tex}
