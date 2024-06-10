@@ -41,3 +41,6 @@ Below are some sample images from each dataset:
 
 ## Clustering Code
 To manage the diversity of images within each dataset, we devised a solution that involves extracting features from each image, grouping images into clusters based on feature similarity, selecting representative images from each cluster based on specific criteria, and generating synthetic images for each cluster separately. The code for this process can be found in the [Clustering section of the repository](https://github.com/fededemo/data_augmentation_using_synthetic_images/tree/main/clustering).
+
+## Other documentation
+You can find our Master defense's presentation [here](https://docs.google.com/presentation/d/1D06am81J2b8AY9pYANHeYo_rj_DAH7WTrEM1iQ3gAJk/edit?usp=sharing)
